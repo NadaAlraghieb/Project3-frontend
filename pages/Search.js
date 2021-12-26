@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from "react";
-import {
-  Navbar,
-  Container,
-  Brand,
-  Nav,
-  Image,
-  Col,
-  InputGroup,
-  FormControl,
-  Table,
-  Card,
-} from "react-bootstrap";
+// import {
+//   Navbar,
+//   Container,
+//   Brand,
+//   Nav,
+//   Image,
+//   Col,
+//   InputGroup,
+//   FormControl,
+//   Table,
+//   Card,
+// } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useLocation } from "react-router-dom";
-import Button from "@restart/ui/esm/Button";
+
+//import {useLocation} from "react-dom";
+
 import axios from "axios";
 
 export default function Search() {
-  const { state } = useLocation();
+  //const { state } = useLocation();
 
   const [SearchData, setSearchData] = useState([]);
 
   useEffect(() => {
     axios
-      .post("userController/Search", {
-        city: state.city,
-        subjact: state.subjact,
+      .post("http://localhost:5000/users/teacher", {
+        city:city,
+        
       })
       .then((res) => {
         if (res.data.length > 0) setSearchData(res.data);
@@ -34,7 +35,7 @@ export default function Search() {
         }
       })
       .catch((err) => {});
-  }, [state]);
+  }, []);
 
   return SearchData.length > 0 ? (
     <div>
@@ -50,14 +51,14 @@ export default function Search() {
           </tr>
         </thead>
         <tbody>
-          {SearchData.map((item, i) => {
+          {SearchData.map((item) => {
             return (
-              <tr key={i}>
-                <td> {i + 1}</td>
+              <tr key={item._id}>
+                <td> </td>
                 <td>{item.fullName}</td>
                 <td>{item.email}</td>
                 <td>{item.phoneNumber}</td>
-                <td>{item.age}</td>
+               
                 <td>{item.city}</td>
               </tr>
             );

@@ -1,80 +1,89 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import {useState, useContext, useEffect} from 'react'
-import valid from '../database/valid'
-import {DataContext} from '../store/GlobalState'
-import {postData} from '../database/fetchData'
-import { useRouter } from 'next/router'
-import Cookie from  'js-cookie'
-import {}from 'next/router'
-
-
-
-const SignIn =()=>{
-  const initialState = { email: '', password: '' }
-  const [userData, setUserData] = useState(initialState)
-  const {  email, password } = userData
-  const {state, dispatch} = useContext(DataContext)
-  const { auth } = state
-
+import React, { useState } from "react";
+import { Form, Button, Card } from "react-bootstrap";
+import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/router";
+function SignIn(props) {
   const router = useRouter()
-  
-  const handleChangeInput = e => {
-    const {name, value} = e.target
-    setUserData({...userData, [name]:value})
-    dispatch({ type: 'NOTIFY', payload: {} })
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rong, setRong] = useState(false);
+  function handleSubmit(e) {
+    e.preventDefault();
+    const data = {
+      email: email,
+      password: password,
+      // courses: courses,
+    };
+    axios
+      .post("http://localhost:5000/users/login", data)
+      .then((response) => {
+        console.log(response.data.message);
+        router.push("/");
+        // localStorage.setItem("users", JSON.stringify(data));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
-  const handleSubmit = async e => {
-    e.preventDefault()
-    
-    dispatch({ type: 'NOTIFY', payload: {loading: true} })
-
-    const res = await postData('controller/login', userData)
-
-    if(res.err) return dispatch({ type: 'NOTIFY', payload: {error: res.err} })
-
-     dispatch({ type: 'NOTIFY', payload: {success: res.msg} })
-     dispatch({ type: 'AUTH', payload: {
-      token: res.access_token,
-      user: res.user  
-
-     } })
-    
-    Cookie.set('refreshtoken', res.refresh_token, {
-      path: 'api/controller/accessToken',
-      expires: 7
-    })
-    localStorage.setItem('firstLogin', true)
-  }
-  useEffect(() => {
-    if(Object.keys(auth).length !== 0) router.push("/")
-  }, [auth])
-
-    return(
-      <div>
-          <Head>
-              <title>
-                  Sign in page
-              </title>
-          </Head>
-          <form className='mx-auto my-4' style={{maxWidth:'500px'}}onSubmit={handleSubmit}>
-             <div className="form-group">
-                  <label htmlFor="exampleInputEmail1">Email address</label>
-                  <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"
-                  name="email" value={email} onChange={handleChangeInput} />
-                  <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
-
+  return (
+    <div className="signin">
+      <div className=" container" style={{ margin: "60px" }}>
+        <div className=" row gutters">
+          <div className="  col-xl-4 " style={{ margin: "60px" }}>
+            <div className=" card h-100">
+              <div className=" card-body">
+                <Card className="cardSignIn" style={{ paddingBottom: "20px" }}>
+                  <Card.Body>
+                    <Form onSubmit={handleSubmit}>
+                      <Form.Group size="lg" controlId="email">
+                        <Form.Label id="h">Email</Form.Label>
+                        <Form.Control
+                          autoFocus
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group size="lg" controlId="password">
+                        <Form.Label id="h">Password</Form.Label>
+                        <Form.Control
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                      </Form.Group>
+                      <br></br>
+                      <Button
+                        className="btn btn-dark w-100"
+                        block
+                        size="lg"
+                        type="submit"
+                      >
+                        Login
+                      </Button>
+                      <p className="my-2">
+                        I don't have an account?
+                        <Link href="/SignUp">
+                          <a style={{ color: "crimson" }}>Sign Up Now</a>
+                        </Link>
+                      </p>
+                    </Form>
+                  </Card.Body>
+                </Card>
+                {rong && (
+                  <center>
+                    <span className="spanSignIn">
+                      The Email or Password is Incorrect{" "}
+                    </span>
+                  </center>
+                )}
+              </div>
             </div>
-            <div className="form-group">
-                  <label htmlFor="exampleInputPassword1">Password</label>
-                  <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"
-                  name="password" value={password} onChange={handleChangeInput} />
-            </div>
-                <button type="submit" className="btn btn-dark w-100">Login</button>
-                  <p className='my-2'>You dont't have an account?
-                       <Link  href='/register'><a style={{color:'crimson'}}>Register</a></Link></p>
-          </form>
+          </div>
+        </div>
       </div>
-    )
-  }
-  export default SignIn
+    </div>
+  );
+}
+export default SignIn;

@@ -7,16 +7,7 @@ import { useRouter } from 'next/router'
 
 
 
-// export async function getStaticProps(context){
-//   const res = await fetch("/register")
-//   const data = await res.json()
 
-
-
-//   return {
-//     props: { data }, // will be passed to the page component as props
-//   }
-// }
 
 const Register = () => {
   const initialState = { name: '', email: '', password: '', cf_password: '' }
